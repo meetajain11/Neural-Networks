@@ -1,27 +1,52 @@
 class Perceptron{
     
-    constructor(w1, w2, b){
+    constructor(w1, w2, b, inputType){
         this.w1 = w1;
         this.w2 = w2;
         this.b = b;
+        this.inputType = inputType;
         this.yout = [];
+    }
+
+    binaryThreshold(yin){
+        if(yin >= 0){
+            return 1;
+        }
+        else{
+            return 0;
+        }
+    }
+
+    bipolarThreshold(yin){
+        if(yin > 0){
+            return 1;
+        }
+        else if(yin < 0){
+            return -1;
+        }
+        else{
+            return 0;
+        }
     }
 
     //Takes the input and target arrays.
     input(x1, x2, t){
         for(let i = 0;i<4;i++){
-            let yput;
             let yin = this.w1*x1[i] + this.w2*x2[i] + this.b;
-            if(yin >= 0){
-                yput = 1;
+            let yput;
+            if(this.inputType === "binary"){
+                yput = this.binaryThreshold(yin);
             }
             else{
-                yput = 0;
+                yput = this.bipolarThreshold(yin);
             }
 
             this.update(yput, t[i], x1[i], x2[i]);
             this.yout[i] = yput;
         }
+
+        //Check If target values are equal to the computed output.
+        //If yes, terminate the program else compute the next epoch.
         if(this.check(this.yout, t)){
             this.print();
         }
@@ -50,13 +75,14 @@ class Perceptron{
     //Gives the output of the trained network.
     output(x1, x2){
         let y;
-        let yput = this.w1*x1 + this.w2*x2 + 1;
-        if(yput >= 0){
-            y = 1;
+        let yin = this.w1*x1 + this.w2*x2 + 1;
+        if(this.inputType === "binary"){
+            y = this.binaryThreshold(yin);
         }
         else{
-            y = 0;
+            y = this.bipolarThreshold(yin);
         }
+
         console.log(y);
     }
 
@@ -69,5 +95,8 @@ class Perceptron{
 }
 
 //A new instance of Perceptron class is created.
-var orGate = new Perceptron(0,0,0);
-orGate.input([0,0,1,1], [0,1,0,1], [0,1,1,1]);
+var orGateBinary = new Perceptron(0,0,0,"binary");
+orGateBinary.input([0,0,1,1], [0,1,0,1], [0,1,1,1]);
+
+var orGateBipolar = new Perceptron(0,0,0,"bipolar");
+orGateBipolar.input([-1,-1,1,1], [-1,1,-1,1], [-1,1,1,1]);
